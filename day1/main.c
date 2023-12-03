@@ -3,81 +3,10 @@
 #include <ctype.h>
 #include <string.h>
 #include <errno.h>
+#include "../lib/sw.h"
 
 #define ARRAY_LENGTH(x) (sizeof(x) / sizeof((x)[0]))
-
-typedef struct {
-	const char *data;
-	int length;
-} sw;
-
-sw *sw_create(const char *data, int length) {
-	sw *s = (sw*) malloc(sizeof(sw));
-	s->data = data;
-	s->length = length;
-	return s;
-}
-
-sw *sw_dup(const char *s) {
-	return sw_create(s, strlen(s));			
-}
-
-sw *sw_split(sw *s, char sep) {
-	sw *parsed = sw_dup(s->data);
-
-	for (int i = 0; i < s->length; i++) {
-		if (s->data[i] == sep) {
-			s->data = s->data + i + 1;
-			s->length = s->length - i - 1;
-			parsed->length = i;
-			return parsed;
-		}
-	}
-	
-	s->data = "";
-	s->length = 0;
-	return parsed; 
-}
-
-int sw_eq(sw *s1, sw *s2) {
-	if (s1->length == s2->length) {
-		return !strncmp(s1->data, s2->data, s1->length);
-	}
-	return 0; 
-}
-
-sw *slurp_file(char *file_path) {
-	FILE *f = fopen(file_path, "r");
-	if (f == NULL) {
-		fprintf(stderr, "ERROR: file `%s` is not opened\n", file_path); 
-		exit(1);
-	}
-
-	if (fseek(f, 0, SEEK_END) != 0) {
-		fprintf(stderr, "ERROR: Could not read the file `%s`: %s", file_path, strerror(errno));
-		exit(1);
-	}
-
-	long m = ftell(f);
-	if (m < 0) {	
-		fprintf(stderr, "ERROR: Could not read the file `%s`: %s", file_path, strerror(errno));
-		exit(1);	
-	}
-
-	if (fseek(f, 0, SEEK_SET) != 0) {
-		fprintf(stderr, "ERROR: Could not read the file `%s`: %s", file_path, strerror(errno));
-		exit(1);
-	}
-
-	char *buffer = (char*) malloc(m);
-	fread(buffer, sizeof(char), m, f);
-	
-	return sw_create(buffer, m);
-}
-
-void sw_dump(sw *s) {
-	printf("sw->data: %.*s, sw->length: %d\n", s->length, s->data, s->length);
-}
+#define WORD_DIGIT_CAPACITY 12
 
 sw *word_to_digit(sw *digit) {
 	if (sw_eq(digit, sw_dup("one"))) {
@@ -102,8 +31,6 @@ sw *word_to_digit(sw *digit) {
 		return sw_dup("");	
 	}
 }
-
-#define WORD_DIGIT_CAPACITY 12
 
 int main() {
 	sw *str = slurp_file("data2.txt");
