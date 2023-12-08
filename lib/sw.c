@@ -120,5 +120,38 @@ sw *slurp_file(char *file_path) {
 }
 
 void sw_dump(sw *s) {
-	printf("sw->data:\n|%.*s|\n", s->length, s->data);
+	printf("sw->data:\n|%.*s| sw->length: %d\n", s->length, s->data, s->length);
+}
+
+int sw_replace_sw(sw *source, sw *oldvalue, sw *newvalue) {
+	int index = sw_find_sw(source, oldvalue);
+	if (index == -1) {
+		return 0; 
+	}
+
+	int newlength = source->length - oldvalue->length + newvalue->length;
+	char *buffer = (char*) malloc(sizeof(char) * newlength);
+	char *pbuf = buffer;
+	memcpy(pbuf, source->data, index);
+	pbuf += index;
+	memcpy(pbuf, newvalue->data, newvalue->length);
+	pbuf += newvalue->length;
+	memcpy(pbuf, source->data + index + oldvalue->length, source->length - oldvalue->length - index);
+
+	source->data = buffer;
+	source->length = newlength;
+	return 1;
+}
+
+void sw_replace_all_sw(sw *source, sw *oldvalue, sw *newvalue) {
+	while (sw_replace_sw(source, oldvalue, newvalue))
+		;
+}
+
+char sw_get(sw *source, int index, char nop) {
+	if (index < 0 || index > source->length) {
+		return nop;	
+	}
+
+	return source->data[index];
 }

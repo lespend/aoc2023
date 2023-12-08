@@ -13,4 +13,8 @@ day3: day3/main.c
 	$(CC) $(FLAGS) $(INCLUDES) day3/main.c lib/sw.c -o day3/run.out
 	cd day3 && ./run.out
 
-.PHONY: day1 day2 day3
+day4: day4/main.c
+	$(CC) $(FLAGS) $(INCLUDES) day4/main.c lib/sw.c -o day4/run.out
+	cd day4 && ./run.out
+
+.PHONY: day1 day2 day3 day4

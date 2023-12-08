@@ -23,5 +23,8 @@ sw *sw_split_sw(sw *s, sw *sep);
 int sw_eq(sw *s1, sw *s2);
 sw *slurp_file(char *file_path);
 void sw_dump(sw *s);
+int sw_replace_sw(sw *source, sw *oldvalue, sw *newvalue);
+void sw_replace_all_sw(sw *source, sw *oldvalue, sw *newvalue);
+char sw_get(sw *source, int index, char nop);
 
 #endif
